@@ -1,0 +1,297 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 26 09:28:00 2020
+
+@author: brch
+"""
+
+import math
+from datetime import datetime
+import sys
+import matplotlib.pyplot as plt
+
+def get_uniform(index, interval, N):
+    I = interval
+    I = 1.0
+    zeta = float(index)/float(N-1)
+    s = zeta / I * interval
+    return s
+
+
+def get_doubhyptng(stretching_factor, index, interval, N):
+    I = interval
+    I = 1.0
+    zeta = float(index)/float(N-1)
+    delta = stretching_factor
+    s = -(1.0/2.0 * (1.0 + math.tanh(stretching_factor * (zeta/I - 1.0/2.0)) / math.tanh(stretching_factor/2.0)))
+    s = s * interval
+    return s
+
+def get_doubhypsin(stretching_factor, index, interval, N):
+    I = interval
+    I = 1.0
+    zeta = float(index)/float(N-1)
+    delta = stretching_factor
+    s = -(1.0/2.0 * (1.0 + math.sinh(stretching_factor * (zeta/I - 1.0/2.0)) / math.sinh(stretching_factor/2.0)))
+    s = s * interval
+    return s
+
+def get_hyptng(stretching_factor, index, interval, N):
+    I = interval
+    I = 1.0
+    zeta = float(index)/float(N-1)
+    delta = stretching_factor
+    
+    s = -(1.0 + math.tanh(delta*(zeta/I - 1.0))/math.tanh(delta))
+    s = s * interval
+    return s
+
+
+def get_hypsin(stretching_factor, index, interval, N):
+    I = interval
+    I = 1.0
+    zeta = float(index)/float(N-1)
+    delta = stretching_factor
+    
+    s = (1.0 + math.sinh(delta*(zeta/I - 1.0))/math.sinh(delta))
+    s = s * interval
+    return s
+
+
+def make_2d_rect_quad(xmin, xmax, ymin, ymax, refinement):
+    nodes = []
+    elements = []
+    
+    origin = [xmin, ymin]
+    
+    nx = refinement[0]
+    ny = refinement[1]
+    
+    refinex = refinement[2]
+    refiney = refinement[3]
+    
+    stretchingx = refinement[4]
+    stretchingy = refinement[5]
+    
+    x = origin[0]
+    y = origin[1]
+    
+    ij = 0
+    
+    i_prev = -1
+    j_prev = -1
+    
+    e = 0
+
+    for j in range(0, ny):
+
+        if refiney == "uniform":
+            y_00 = get_uniform(j, ymax-ymin, ny)
+        elif refiney == "hyptng":
+            y_00 = get_hyptng(stretchingy, j, ymin-ymax, ny)
+        elif refiney == "hypsin":
+            y_00 = get_hypsin(stretchingy, j, ymin-ymax, ny)
+        elif refiney == "doubhyptng":
+            y_00 = get_doubhyptng(stretchingy, j, ymin-ymax, ny)
+        elif refiney == "doubhypsin":
+            y_00 = get_doubhypsin(stretchingy, j, ymin-ymax, ny)
+        else:
+            sys.exit("Unknown y mesh function. Aborting.")
+
+        y = origin[1] + y_00
+
+        for i in range(0, nx):
+            if refinex == "uniform":
+                x_00 = get_uniform(i, xmax-xmin, nx)
+            elif refinex == "hyptng":
+                x_00 = get_hyptng(stretchingx, i, xmin-xmax, nx)
+            elif refinex == "hypsin":
+                x_00 = get_hypsin(stretchingx, i, xmin-xmax, nx)
+            elif refinex == "doubhyptng":
+                x_00 = get_doubhyptng(stretchingx, i, xmin-xmax, nx)
+            elif refinex == "doubhypsin":
+                x_00 = get_doubhypsin(stretchingx, i, xmin-xmax, nx)
+            else:
+               sys.exit("Unknown x mesh function. Aborting.")
+
+            x = origin[0] + x_00 #* (xmax-xmin)
+            
+            nodes.append([ij, x, y])
+            
+            ij = ij + 1
+
+            if (i_prev >= 0 and j_prev >= 0):
+
+                node1 = i_prev 	+ nx * j_prev
+                node2 = i 	+ nx * j_prev
+                node3 = i_prev 	+ nx * j
+                node4 = i 	+ nx * j
+                elements.append([e, node1, node2, node3, node4])
+            
+                e = e + 1
+            
+            i_prev = i_prev + 1
+
+        
+        
+        j_prev = j_prev + 1
+        
+        i_prev = -1
+
+    return nodes, elements
+
+
+def make_3d_box_quad(xmin, xmax, ymin, ymax, zmin, zmax, refinement):
+        nodes = [] 
+        elements = []
+
+        origin = [xmin, ymin, zmin]
+
+        nx = refinement[0]
+        ny = refinement[1]
+        nz = refinement[2]
+
+        refinex = refinement[3]
+        refiney = refinement[4]
+        refinez = refinement[5]
+
+        stretchingx = refinement[6]
+        stretchingy = refinement[7]
+        stretchingz = refinement[8]
+
+        x = origin[0]
+        y = origin[1]
+        z = origin[2]
+
+        ijk = 0
+
+        i_prev = -1
+        j_prev = -1
+        k_prev = -1
+
+        e = 0
+
+        for k in range(0, nz):
+            
+                if refinez == "uniform":
+                        z_000 = get_uniform(k, zmax-zmin, nz)
+                elif refinez == "hyptng":
+                        z_000 = get_hyptng(stretchingz, k, zmax-zmin, nz)
+                elif refinez == "doubhyptng":
+                        z_000 = get_doubhyptng(stretchingz, k, zmax-zmin, nz)
+                else:
+                        sys.exit("Unknown y mesh function. Aborting.")
+
+                z = origin[2] + z_000
+                
+                for j in range(0, ny):
+                    
+
+                        if refiney == "uniform":
+                                y_000 = get_uniform(j, ymax-ymin, ny)
+                        elif refiney == "hyptng":
+                                y_000 = get_hyptng(stretchingy, j, ymin-ymax, ny)
+                        elif refiney == "doubhyptng":
+                                y_000 = get_doubhyptng(stretchingy, j, ymin-ymax, ny)
+                        else:
+                                sys.exit("Unknown y mesh function. Aborting.")
+
+
+
+                        y = origin[1] + y_000
+
+
+                        for i in range(0, nx):
+                                if refinex == "uniform":
+                                        x_000 = get_uniform(i, xmax-xmin, nx)
+                                elif refinex == "hyptng":
+                                        x_000 = get_hyptng(stretchingx, i, xmin-xmax, nx)
+                                elif refinex == "doubhyptng":
+                                        x_000 = get_doubhyptng(stretchingx, i, xmin-xmax, nx)
+                                else:
+                                        sys.exit("Unknown x mesh function. Aborting.")
+
+                                x = origin[0] + x_000
+
+                                nodes.append([ijk, x, y, z])
+
+                                ijk = ijk + 1
+
+
+
+
+                                if (i_prev >= 0 and j_prev >= 0 and k_prev >= 0):
+
+                                        node1 = i_prev  +  nx * j_prev  + nx * ny * k_prev
+                                        node2 = i       +  nx * j_prev  + nx * ny * k_prev
+                                        node3 = i_prev  +  nx * j       + nx * ny * k_prev
+                                        node4 = i       +  nx * j       + nx * ny * k_prev
+                                        node5 = i_prev  +  nx * j_prev  + nx * ny * k
+                                        node6 = i       +  nx * j_prev  + nx * ny * k
+                                        node7 = i_prev  +  nx * j       + nx * ny * k
+                                        node8 = i       +  nx * j       + nx * ny * k
+                                        elements.append([e, node1, node2, node3, node4, node5, node6, node7, node8])
+
+                                        e = e + 1
+
+                                i_prev = i_prev + 1
+
+
+                        j_prev = j_prev + 1
+
+                        i_prev = -1
+
+
+
+                k_prev = k_prev + 1
+
+                i_prev = -1
+                j_prev = -1
+
+        return nodes, elements
+
+
+
+
+
+
+xmin = 0.0
+xmax = 4.0
+ymin = 0.0
+ymax = 8.0
+zmin = 0.0
+zmax = 12.0
+tol = 1.e-8
+
+#refinement = (10, 10, "hyptng", "hyptng", 1.0, 2.5)
+refinement = (10, 10, 10, "hyptng", "uniform", "doubhyptng", -4.5, 4.5, -4.0)
+
+
+nodes, elements = make_3d_box_quad(xmin, xmax, ymin, ymax, zmin, zmax, refinement)
+
+
+
+
+
+
+
+xs = []
+ys = []
+zs = []
+for n in range(0, len(nodes)):
+    xs.append(nodes[n][1])
+    ys.append(nodes[n][2])
+    zs.append(nodes[n][3])
+
+plt.figure()    
+plt.scatter(xs, ys)
+plt.show()
+
+plt.figure()    
+plt.scatter(xs, zs)
+plt.show()
+
+plt.figure()    
+plt.scatter(ys, zs)
+plt.show()
