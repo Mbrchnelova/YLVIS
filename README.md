@@ -37,3 +37,5 @@ Also, the code is just a couple of thousands of lines, so going through it might
 
 In addition, the code is basically still in development as the applications are growing, so if you want to use it and there are weird messages/ print statements 
 popping up, just contact me and we can figure it out together. 
+
+For now, ignore the other files in the repository unless you know what they are for.
