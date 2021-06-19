@@ -2,6 +2,7 @@ Welcome to YLVIS (pYthon-based consoLe finite-Volume meshIng Software), my meshi
 - hypersonic computational fluid dynamics (CFD) simulations
 - CFD simulations of the solar chromosphere and solar corona
 but it can be used by whoever for whatever. 
+Note: this code is an intellectual property of KU Leuven, CmPA. 
 
 
 This is a simple pyton-based meshing program capable of generating GAMBIT neutral mesh files for your CFD simulations for:
