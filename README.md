@@ -1,4 +1,4 @@
-Welcome to YLVIS (pYthon-based consoLe finite-Volume meshIng tool), my meshing library! This library was developed mainly for:
+Welcome to YLVIS (pYthon-based consoLe finite-Volume meshIng Software), my meshing library! This library was developed mainly for:
 - hypersonic computational fluid dynamics (CFD) simulations
 - CFD simulations of the solar chromosphere and solar corona
 but it can be used by whoever for whatever. 
