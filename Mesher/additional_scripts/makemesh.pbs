@@ -1,0 +1,16 @@
+#!/bin/bash -l
+#PBS -N FluxTube 
+# request 1 cpu:
+#PBS -l nodes=1:ppn=1
+# request it for 120 minutes:
+#PBS -l walltime=02:00:00
+# cd to the directory from which qsub is run:
+#PBS -A default_project 
+#PBS -M michaela.brchnelova@kuleuven.be
+
+cd $PBS_O_WORKDIR
+
+module purge
+Python/2.7.14-intel-2018a
+
+python2.7 main.py 2d
