@@ -1,0 +1,8 @@
+#
+Intitial_limiter_dissipation_coefficient = 1.0
+Final_limiter_dissipation_coefficient = 0.0
+Thershold_residual_for_switching_dissipation_cofficient = -3.0
+Stop_limiting_once_down_to_0.0 = 1
+Switch_order_residual = -4.0
+Interactive_file_name_and_path = ./quadrupole_1sys.inter
+Convergence_file_name_and_path = ./CORONA_quadrupole/convergence.plt-P0.FlowNamespace
