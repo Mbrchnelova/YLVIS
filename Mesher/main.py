@@ -730,10 +730,10 @@ def write_mesh(path, name, block_type, elements, nodes, boundaries, ngrps, nbset
 	for n in range(0, len(nodes)):
 		node = nodes[n]
 		if block_type == "2d_rect_quad":
-			line = str(node[0]+1) + '\n' + str(node[1]) + '\n' + str(node[2])  + '\n'
+			line = str(node[0]+1) + '\n' + str(node[1]*xlength) + '\n' + str(node[2]*ylength)  + '\n'
 
 		elif block_type == "3d_box_quad":
-                        line = str(node[0]+1) + '\n' + str(node[1]) + '\n' + str(node[2]) + '\n' + str(node[3])  + '\n'
+                        line = str(node[0]+1) + '\n' + str(node[1]*xlength) + '\n' + str(node[2]*ylength) + '\n' + str(node[3]*zlength)  + '\n'
 
 
 		else:
@@ -953,10 +953,15 @@ start_e = 0
 
 # Define and add the first block
 xmin = 0.0
-xmax = 2.0
+xmax = 1.0
 ymin = 0.0
 ymax = 1.0
 tol = 1.e-8
+
+#NOTE: For some functions, it was found that the length scaling works poorly. If the mesh starts from 0,0(,0), it might be safer to just define xmax, ymax(, zmax) as 1's and then define "xlength, ylength(, zlength)" as the upper limits. In this case, the entire mesh generation will be done on a [0,1] domain, only when the mesh is being written, the node coordinates are scaled by the respective factor. 
+xlength = 1.0
+ylength = 1.0
+zlength = 1.0
 
 refinement = (250, 250, "negatsin", "hyptng", 3.0, 4.0)
 name = "250x250_sin_tg_3_4.brch"
